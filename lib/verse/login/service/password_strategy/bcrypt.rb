@@ -3,18 +3,18 @@
 module Verse
   module Login
     module PasswordStrategy
-      class BCrypt
-        class << self
-          attr_accessor :initialized
-        end
+      module BCrypt
+        @initialized = false
 
-        def check?(password, encrypted_password)
+        def self.check?(password, encrypted_password)
           return false unless encrypted_password
 
-          unless self.class.initialized
+          unless @initialized
             begin
+              # Because bcrypt gem is not always available,
+              # we need to require it only when needed.
               require "bcrypt"
-              self.class.initialized = true
+              @initialized = true
             rescue LoadError
               raise LoadError, "BCrypt library not found. Please install the bcrypt gem."
             end
