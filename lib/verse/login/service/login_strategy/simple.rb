@@ -6,7 +6,7 @@ module Verse
       # User password based authentication
       class SimpleLogin < Base
 
-        def initalize(auth_context)
+        def initialize(auth_context)
           super
 
           @username_column = Verse::Login::Config.user_column_username

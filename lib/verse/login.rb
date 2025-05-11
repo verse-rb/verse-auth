@@ -16,3 +16,6 @@ require_relative "login/service/login_strategy/simple"
 require_relative "login/service/password_strategy/bcrypt"
 
 require_relative "login/expo/helper"
+
+require_relative "login/service/token_builder"
+require_relative "login/config/config"

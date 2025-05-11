@@ -11,5 +11,10 @@ gem "rspec", "~> 3.0"
 
 gem "rubocop", "~> 1.21"
 
-
 gem "verse-core", github: "verse-rb/verse-core", branch: "master"
+
+gem "pry"
+
+gem "simplecov"
+
+gem "bootsnap", "~> 1.17"
