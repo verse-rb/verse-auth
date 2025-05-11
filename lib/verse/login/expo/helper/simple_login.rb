@@ -1,3 +1,5 @@
+require_relative "./simple_login_input"
+
 module Verse
   module Login
     module Helper
@@ -39,7 +41,7 @@ module Verse
           path: "login",
           input: SimpleLoginInput,
           description: DESCRIPTION,
-          method_name: :simple_login
+          method_name: :simple_login,
           **opts
         )
           input_arg = input

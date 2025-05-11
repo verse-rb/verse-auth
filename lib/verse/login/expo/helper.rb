@@ -1,3 +1,5 @@
+require_relative "./helper/simple_login"
+
 module Verse
   module Login
     module Helper
