@@ -44,19 +44,19 @@ module Verse
             Verse::Login::Config.verifiable_column
           )
 
-          return !!verified
+          return if verified
 
-          raise Verse::Login::Error::AccountNotVerified
+          raise Verse::Login::Error::AccountNotVerified, "Account is not verified"
         end
 
         def assert_is_not_locked!(user)
-          active = user.send(
+          locked = user.send(
             Verse::Login::Config.lockable_column
           )
 
-          return !!active
+          return if !locked
 
-          raise Verse::Login::Error::AccountLocked
+          raise Verse::Login::Error::AccountLocked, "Account is locked"
         end
       end
     end

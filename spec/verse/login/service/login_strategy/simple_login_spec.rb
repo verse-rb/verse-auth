@@ -62,7 +62,6 @@ RSpec.describe Verse::Login::LoginStrategy::SimpleLogin do
         expect { subject.call(username, password) }.to raise_error(Verse::Error::AuthenticationFailed)
       end
     end
-
     context "when user is not found" do
       before do
         allow(user_repository).to receive(:find_by!).and_raise(Verse::Error::RecordNotFound)
@@ -84,7 +83,7 @@ RSpec.describe Verse::Login::LoginStrategy::SimpleLogin do
       allow(password_strategy).to receive(:check?).with(password, encrypted_password).and_return(true)
     end
 
-    it "checks if user is verified" do
+    it "allows login when user is verified" do
       allow(user).to receive(:send).with(:verified_at).and_return(Time.now)
       expect(subject.call(username, password, role: role, env: env)).to eq(auth_token_result)
     end
@@ -103,7 +102,7 @@ RSpec.describe Verse::Login::LoginStrategy::SimpleLogin do
       allow(password_strategy).to receive(:check?).with(password, encrypted_password).and_return(true)
     end
 
-    it "checks if user is not locked" do
+    it "allows login when user is not locked" do
       allow(user).to receive(:send).with(:locked_at).and_return(nil)
       expect(subject.call(username, password, role: role, env: env)).to eq(auth_token_result)
     end
@@ -137,10 +136,19 @@ RSpec.describe Verse::Login::LoginStrategy::SimpleLogin do
     it "uses custom password strategy" do
       custom_strategy = double("custom_strategy")
       allow(Verse::Login::Config).to receive(:password_strategy).and_return(custom_strategy)
+
+      # Create a new instance after mocking the config
+      instance = described_class.new(auth_context)
+      allow(instance).to receive(:user_repository).and_return(user_repository)
       allow(user_repository).to receive(:find_by!).and_return(user)
+      allow(user).to receive(:send).with(:encrypted_password).and_return(encrypted_password)
       allow(custom_strategy).to receive(:check?).with(password, encrypted_password).and_return(true)
 
-      expect(subject.call(username, password, role: role, env: env)).to eq(auth_token_result)
+      # Set up token builder for the new instance
+      allow(Verse::Login::TokenBuilder).to receive(:new).and_return(token_builder)
+      allow(token_builder).to receive(:build).and_return(auth_token_result)
+
+      expect(instance.call(username, password, role: role, env: env)).to eq(auth_token_result)
     end
   end
 end

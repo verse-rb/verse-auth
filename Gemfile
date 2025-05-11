@@ -18,3 +18,5 @@ gem "pry"
 gem "simplecov"
 
 gem "bootsnap", "~> 1.17"
+
+gem "bcrypt", "~> 3.1"
