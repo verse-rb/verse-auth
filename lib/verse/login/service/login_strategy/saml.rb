@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "./base"
 
 module Verse
@@ -5,16 +7,15 @@ module Verse
     module LoginStrategy
       # Use SAML for authentication
       class Saml < Base
-
         def init(channel:, redirect:)
           assert_channel_valid!(channel)
 
           if redirect
-            allow_redirect = Config.saml_allow_custom_redirect
+            Config.saml_allow_custom_redirect
             cookie = Config.saml_custom_redirect_cookie
             host_check = Config.saml_custom_redirect_host_check
 
-            if host_check.nil? || host_check.(redirect)
+            if host_check.nil? || host_check.call(redirect)
               server.env["HTTP_REFERER"] = nil
 
               server.response.set_cookie(cookie, value: redirect)
@@ -37,13 +38,13 @@ module Verse
 
           raise Verse::Error::BadCredentials, "Invalid credentials" unless response.is_valid?
 
-          username = response.nameid
+          response.nameid
 
           account = system_accounts.find_by({ email: }, included: ["active_roles", "person", "state"])
 
           raise Verse::Error::Authorization, "Account not registered" unless account
 
-          build_tokens(account, nil, ip:, nonce: SecureRandom.random_number(2 ** 63))
+          build_tokens(account, nil, ip:, nonce: SecureRandom.random_number(2**63))
 
           default_redirect = Settings["redirect.default"]
           redirect = server.cookies["redirect"] || default_redirect
@@ -72,9 +73,9 @@ module Verse
         end
 
         private def assert_channel_valid!(channel)
-          if !Config.saml_providers.key?(channel)
-            raise Error::InvalidSamlProvider, "Invalid SAML provider"
-          end
+          return if Config.saml_providers.key?(channel)
+
+          raise Error::InvalidSamlProvider, "Invalid SAML provider"
         end
       end
     end

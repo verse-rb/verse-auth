@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Verse
   module Login
     module Error

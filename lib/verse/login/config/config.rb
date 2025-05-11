@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Verse
   module Login
     module Config
@@ -8,7 +10,7 @@ module Verse
 
       # Role definition for the custom role backend
       attr_accessor :role_definition_path
-      attr_accessor :role_definition_template_path
+      attr_accessor :role_definition_template_path, :user_column_username, :user_column_encrypted_password, :user_column_role, :user_primary_key, :refresh_token, :refresh_token_repository, :refresh_token_nonce, :verifiable, :verifiable_column, :lockable_column, :saml_default_redirect, :saml_custom_redirect_cookie
 
       @role_type = :single # :single or :multiple
       @role_column = :role # The column name in the user table
@@ -35,11 +37,6 @@ module Verse
 
       # Strategy used for login
       attr_accessor :user_repository
-      attr_accessor :user_column_username
-      attr_accessor :user_column_encrypted_password
-      attr_accessor :user_column_role
-      attr_accessor :user_primary_key
-
 
       # The algorithm used to check the password hash
       attr_accessor :password_strategy
@@ -47,6 +44,7 @@ module Verse
       # This is to prevent inferring the existence of a user
       # based on the time it takes to check the password.
       attr_accessor :wait_when_user_not_found
+
       @password_strategy = Verse::Login::PasswordStrategy::BCrypt.new
       @wait_when_user_not_found = 0.2
 
@@ -55,17 +53,10 @@ module Verse
       @refresh_token_repository = "User::LoginState::Repository"
       @refresh_token_nonce = :nonce
 
-      attr_accessor :refresh_token
-      attr_accessor :refresh_token_repository
-      attr_accessor :refresh_token_nonce
-
       # Whether the login check for registration
       # before login.
       @verifiable = false
       @verifiable_column = :verified_at
-
-      attr_accessor :verifiable
-      attr_accessor :verifiable_column
 
       # Whether the login check that the user is active
       # or not.
@@ -75,7 +66,6 @@ module Verse
       # Whether the login check that the user is active
       # or not.
       attr_accessor :lockable
-      attr_accessor :lockable_column
 
       # SAML configuration
 
@@ -91,9 +81,6 @@ module Verse
       # Useful for example if the user was on a page
       # and need to login again.
       attr_accessor :saml_allow_custom_redirect
-      attr_accessor :saml_default_redirect
-
-      attr_accessor :saml_custom_redirect_cookie
       # Security to prevent redirection to external sites.
       # This configuration value is requiring a proc
       # that will check the host of the redirect URL.

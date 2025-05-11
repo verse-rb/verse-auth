@@ -3,7 +3,6 @@
 module Verse
   module Login
     class RoleRepository < Verse::Model::InMemory::Repository
-
       class << self
         attr_accessor :no_description
       end

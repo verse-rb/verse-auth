@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "./helper/simple_login"
 
 module Verse

@@ -1,75 +1,78 @@
+# frozen_string_literal: true
+
 module Verse
   module Login
     class TokenBuilder
-      def build(user, role, env: nil, nonce: nil)
+      def build(_user, role, env: nil, nonce: nil)
         active_roles = account.active_roles
 
         # If no active roles for the given account, raise error
         if active_roles.empty?
           raise Verse::Error::Authorization, "No role active"
         end
-      # Select active roles which are matching the role name
-      # we try to login into.
-      # if role_name is nil, it will returns empty
-      roles_array = active_roles.select { |x| x.name == role_name }
 
-      # case the role is not found
-      if roles_array.empty?
-        # We check the last role used that is active
-        # else we use the first active role
-        last_role_name = system_account_logins.last_login_role_for(account.id)
+        # Select active roles which are matching the role name
+        # we try to login into.
+        # if role_name is nil, it will returns empty
+        roles_array = active_roles.select { |x| x.name == role_name }
 
-        active_role =
-          if active_roles.find { |x| x.name == last_role_name }
-            last_role_name
-          else
-            active_roles.first&.name
-          end
+        # case the role is not found
+        if roles_array.empty?
+          # We check the last role used that is active
+          # else we use the first active role
+          last_role_name = system_account_logins.last_login_role_for(account.id)
 
-        return build_tokens(account, active_role, nonce:, ip:)
-      end
+          active_role =
+            if active_roles.find { |x| x.name == last_role_name }
+              last_role_name
+            else
+              active_roles.first&.name
+            end
 
-      # Fetch labels from the role repository
-      role = system_roles.find_by({ name: role_name })
+          return build_tokens(account, active_role, nonce:, ip:)
+        end
 
-      unless role
-        raise Verse::Error::ValidationFailed, "Cannot find role #{role_name}"
-      end
+        # Fetch labels from the role repository
+        role = system_roles.find_by({ name: role_name })
 
-      scope = merge_roles(roles_array)
+        unless role
+          raise Verse::Error::ValidationFailed, "Cannot find role #{role_name}"
+        end
 
-      exp = Time.now.to_i + Settings["auth_token.lifetime"]
+        scope = merge_roles(roles_array)
 
-      person = account&.person
+        exp = Time.now.to_i + Settings["auth_token.lifetime"]
 
-      # encode the auth_token
-      auth_token = Verse::Http::Auth::Token.encode(
-        {
-          id: account.id,
-          name: person&.name,
-          email: account.email,
-          person_id: person&.id,
-          labels: role.labels
-        }.compact,
-        role_name,
-        scope,
-        exp:
-      )
+        person = account&.person
 
-      # generate a refresh token
-      refresh_token = create_refresh_token(account, role_name, ip:, nonce:)
-
-      roles_data = system_roles.index({ name: active_roles.map(&:name) })
-
-      active_roles_data =
-        active_roles.map do |r|
-          role_data = roles_data.find { |x| x.name == r.name }
+        # encode the auth_token
+        auth_token = Verse::Http::Auth::Token.encode(
           {
-            name: r.name,
-            description: role_data.description,
-            scopes: r.scopes
-          }
-        end.sort_by { |x| x[:name] }
+            id: account.id,
+            name: person&.name,
+            email: account.email,
+            person_id: person&.id,
+            labels: role.labels
+          }.compact,
+          role_name,
+          scope,
+          exp:
+        )
+
+        # generate a refresh token
+        refresh_token = create_refresh_token(account, role_name, ip:, nonce:)
+
+        roles_data = system_roles.index({ name: active_roles.map(&:name) })
+
+        active_roles_data =
+          active_roles.map do |r|
+            role_data = roles_data.find { |x| x.name == r.name }
+            {
+              name: r.name,
+              description: role_data.description,
+              scopes: r.scopes
+            }
+          end.sort_by { |x| x[:name] }
 
         Model::AccountAuthRecord.new(
           {

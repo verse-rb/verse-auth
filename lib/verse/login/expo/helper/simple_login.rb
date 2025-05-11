@@ -1,10 +1,11 @@
+# frozen_string_literal: true
+
 require_relative "./simple_login_input"
 
 module Verse
   module Login
     module Helper
       module SimpleLoginHelper
-
         DESCRIPTION = <<-MD
           This endpoint is used to authenticate a user with a username and password.
           It returns tokens for authentication and refresh, and rights mapping
@@ -54,10 +55,8 @@ module Verse
               input input_arg.schema
             end
             define_method(method_name) do
-              Service::SimpleLogin.new(auth_context).(
-                **input_arg.process_params(params),
-                env: params.env,
-              )
+              Service::SimpleLogin.new(auth_context).call(**input_arg.process_params(params),
+                env: params.env)
             end
           end
         end

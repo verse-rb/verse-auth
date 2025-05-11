@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "./base"
 
 module Verse
@@ -5,7 +7,6 @@ module Verse
     module LoginStrategy
       # User password based authentication
       class SimpleLogin < Base
-
         def initialize(auth_context)
           super
 
@@ -15,12 +16,10 @@ module Verse
           @password_strategy = Verse::Login::Config.password_strategy
         end
 
-        public
-
         def call(username, password, role: nil, env: nil)
           user = user_repository.find_by!({
-            Verse::Login::Config.user_column_username => username,
-          })
+                                            Verse::Login::Config.user_column_username => username,
+                                          })
 
           auth_failed! unless user
 

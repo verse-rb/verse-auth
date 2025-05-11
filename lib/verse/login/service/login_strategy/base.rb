@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 module Verse
   module Login
     module LoginStrategy
       class Base < Verse::Service::Base
-
         protected
 
         def user_repository
@@ -29,13 +30,13 @@ module Verse
           assert_is_verified!(user) if Verse::Login::Config.registerable
           assert_is_not_locked!(user) if Verse::Login::Config.lockable
 
-          nonce = SecureRandom.random_number(2 ** 63)
+          SecureRandom.random_number(2**63)
 
           Verse::Login::TokenBuilder.new(auth_context).build(
             user,
             role,
             env:,
-            nonce: SecureRandom.random_number(2 ** 63),
+            nonce: SecureRandom.random_number(2**63),
           )
         end
 
