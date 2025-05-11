@@ -1,0 +1,17 @@
+# Team leader (Or "Supervisor")
+template_not_found:
+  description: |
+    This is a long description of the role.
+    It can be multiple lines long.
+  assignable: true # Additional field, should be detected in the role record
+  scopes:
+    - projects
+  labels: ["lead"]
+  rights:
+    # IAM
+    - $template_not_found # Reference a template which does not exist
+
+    # API keys:
+    - iam:account:api_keys.read.own
+    - iam:account:api_keys.delete.own
+    - iam:account:api_keys.create.{off_ro_proj,wf_ro_proj,wf_p,wf_mng_proj}

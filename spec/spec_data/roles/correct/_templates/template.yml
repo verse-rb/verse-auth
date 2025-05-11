@@ -1,0 +1,9 @@
+name: Read my team
+description: I can read personal information of my teams
+resources:
+  - "iam:accounts.read.my_team"
+
+  - "iam:people.read.my_team"
+  - "iam:people.write.own"
+
+  - "iam:organizational_units.read.*"

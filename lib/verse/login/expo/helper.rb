@@ -1,0 +1,9 @@
+module Verse
+  module Login
+    module Helper
+      extend self
+
+      include SimpleLoginHelper
+    end
+  end
+end
